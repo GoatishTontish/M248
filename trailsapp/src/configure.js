@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Configure() {
+
+  // Variables for the new Trail
   const [newTrailName, setNewTrailName] = useState("");
   const [newTrailDate, setNewTrailDate] = useState("");
 
+  // Navigate variable
   const navigate = useNavigate();
   
+  // Add trail and navigate to the main page
   const handleAddTrail = (event) => {
     event.preventDefault();
   

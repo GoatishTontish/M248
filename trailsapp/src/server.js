@@ -4,8 +4,9 @@ const cors = require('cors');
 
 const app = express();
 const port = 4000;
-const apiKey = 'ZCgsxieFrvxmiHCSL2jd5iUJQ4US86Dn'; // Make sure this is correct
+const apiKey = '5HZGWSCekwOIiszG3m5z9BlN8A1clFUS';
 
+// Use Cors
 app.use(cors());
 
 app.get('/weather/:city', async (req, res) => {
