@@ -22,38 +22,46 @@ function Configure() {
   };
   
   return (
-    <div>
-      {/* ... rest of your code ... */}
-      <form onSubmit={handleAddTrail}>
-        <label class="font-bold">Name: </label>
-        <input
-          type="text"
-          name="nameEingabe"
-          class="p-2 border border-slate-700 row-span-1 grid mb-5 w-2/6"
-          value={newTrailName}
-          onChange={(event) => setNewTrailName(event.target.value)}
-        />
-  
-        <label class="font-bold">Ausflugsdatum: </label>
-        <input
-          type="text"
-          name="ausflugsDatumEingabe"
-          class="p-2 border border-slate-700 row-span-1 grid w-2/6"
-          value={newTrailDate}
-          onChange={(event) => setNewTrailDate(event.target.value)}
-        />
-        <Link to="/">
-          <button class="border rounded-lg px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 mr-3">
-            Abbrechen
+    <div className="grid place-items-center min-h-screen">
+      <form onSubmit={handleAddTrail} className="flex flex-col items-start gap-5 w-full max-w-md bg-white p-8 border border-slate-900 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-4 self-center">Configure Trail</h2>
+
+        <div className="flex flex-col w-full">
+          <label className="font-bold mb-1">Trail Name:</label>
+          <input
+            type="text"
+            name="nameInput"
+            placeholder="Name..."
+            className="p-2 border border-slate-700 rounded-lg w-full"
+            value={newTrailName}
+            onChange={(event) => setNewTrailName(event.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col w-full">
+          <label className="font-bold mb-1">Trail Date:</label>
+          <input
+            type="date"
+            name="dateInput"
+            className="p-2 border border-slate-700 rounded-lg w-full"
+            value={newTrailDate}
+            onChange={(event) => setNewTrailDate(event.target.value)}
+          />
+        </div>
+
+        <div className="flex justify-end gap-3 w-full mt-4">
+          <button type="submit" className="border rounded-lg px-4 py-2 bg-blue-500 text-white hover:bg-blue-600">
+            Confirm
           </button>
-        </Link>
-        <button type="submit" class="border rounded-lg px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 mt-5 w-2/6">
-          Bestätigen
-        </button>
+          <Link to="/">
+            <button className="border rounded-lg px-4 py-2 bg-red-500 text-white hover:bg-red-600">
+              Cancel
+            </button>
+          </Link>
+        </div>
       </form>
     </div>
   );
-  }
-  
-  export default Configure;
-  
+}
+
+export default Configure;
