@@ -54,6 +54,7 @@ function Main() {
 
   const [showRemoveButton, setShowRemoveButton] = useState(false); // Declare remove button
 
+ 
   // Confirm remove
   const confirmRemove = (index) => {
     if (window.confirm(trailName[index] + " löschen?")) {
@@ -64,17 +65,14 @@ function Main() {
   const location = useLocation();
   const newTrailFromConfigure = location.state?.newTrail; // Get the trail data from the configure page
 
-  // Push a new trail from the configuration, ensuring no duplicates
+  // Push a new trail from the configuration
   useEffect(() => {
     if (newTrailFromConfigure) {
-      const trailExists = trailName.includes(newTrailFromConfigure.name) && trailDate.includes(newTrailFromConfigure.date);
-      if (!trailExists) {
-        setTrailName([...trailName, newTrailFromConfigure.name]);
-        setTrailDate([...trailDate, newTrailFromConfigure.date]);
-      }
+      setTrailName([...trailName, newTrailFromConfigure.name]);
+      setTrailDate([...trailDate, newTrailFromConfigure.date]);
     }
     // eslint-disable-next-line
-  }, [newTrailFromConfigure]);
+  }, []);
 
   // Combine, sort by date and then by name, and keep index for removal
   const combinedData = trailName.map((name, index) => ({
