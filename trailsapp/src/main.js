@@ -140,15 +140,15 @@ function Main() {
         <div className="fixed bottom-2 right-5">
           <Link to="/configure">
             <button className="border rounded-lg px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 mr-3">
-              Hinzufügen
+              Create
             </button>
           </Link>
 
           <button
-            className="border rounded-lg px-4 py-2 bg-blue-500 text-white hover:bg-blue-600"
+            className="border rounded-lg px-4 py-2 bg-red-500 text-white hover:bg-red-600"
             onClick={() => setShowRemoveButton(!showRemoveButton)}
           >
-            Löschen
+            Remove
           </button>
         </div>
       </footer>
