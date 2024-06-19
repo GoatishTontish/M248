@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { fetchRoutePolyline, getStaticMapUrl } from './api/mapboxApi.js';
-import './CSS/main.css'; // Import die CSS file
+import './CSS/main.css'; // Import die CSS-Datei
 
 // Mapbox-Zugangstoken festlegen
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2xpbWU5MSIsImEiOiJjbHhkbnJvMGgwNnEzMmxzaXk0ZHh4YWxtIn0.4MkZmmG8ODN40vZmPDuBJg';
@@ -10,6 +10,38 @@ function Main() {
   // Zustandshooks für Trail-Daten und Map-Bild-URLs
   const [trailData, setTrailData] = useState(() => JSON.parse(localStorage.getItem('trailData')) || []);
   const [mapImageUrl, setMapImageUrl] = useState({});
+
+  // Memoized Funktion zum Hinzufügen eines Trails
+  const addTrail = useCallback((name, date, coordinates) => {
+    const newTrail = {
+      id: Date.now(),
+      name,
+      date,
+      coordinates,
+      mapUrl: '' // Platzhalter für die URL des Kartenbildes
+    };
+
+    // Lokale Speicherung und Zustand aktualisieren
+    setTrailData(prevTrailData => {
+      const updatedTrails = [...prevTrailData, newTrail];
+      localStorage.setItem('trailData', JSON.stringify(updatedTrails));
+      return updatedTrails;
+    });
+
+    // Karte generieren
+    generateMap(coordinates, newTrail.id);
+  }, []);
+
+  // Funktion zum Generieren der Kartenbild-URL
+  const generateMap = async (coordinates, trailId) => {
+    try {
+      const polyline = await fetchRoutePolyline(coordinates[0], coordinates[1], coordinates[0], coordinates[1]);
+      const mapUrl = getStaticMapUrl(coordinates[0], coordinates[1], polyline);
+      setMapImageUrl(prev => ({ ...prev, [trailId]: mapUrl }));
+    } catch (error) {
+      console.error('Error while generating the map:', error);
+    }
+  };
 
   // useEffect-Hook für Initialisierung der Karte
   useEffect(() => {
@@ -45,43 +77,24 @@ function Main() {
 
     // Karte beim Aufräumen entfernen
     return () => initializeMap.remove();
-  }, []);
-
-  // Funktion zum Hinzufügen eines Trails
-  const addTrail = (name, date, coordinates) => {
-    const newTrail = {
-      id: Date.now(),
-      name,
-      date,
-      coordinates,
-      mapUrl: '' // Platzhalter für die URL des Kartenbildes
-    };
-    
-    const updatedTrails = [...trailData, newTrail];
-    setTrailData(updatedTrails);
-    localStorage.setItem('trailData', JSON.stringify(updatedTrails));
-    generateMap(coordinates, newTrail.id);
-  };
-
-  // Funktion zum Generieren der Kartenbild-URL
-  const generateMap = async (coordinates, trailId) => {
-    try {
-      const polyline = await fetchRoutePolyline(coordinates[0], coordinates[1], coordinates[0], coordinates[1]);
-      const mapUrl = getStaticMapUrl(coordinates[0], coordinates[1], polyline);
-      setMapImageUrl(prev => ({ ...prev, [trailId]: mapUrl }));
-    } catch (error) {
-      console.error('Error while generating the map:', error);
-    }
-  };
+  }, [addTrail]);
 
   // Funktion zum Entfernen eines Trails
   const removeTrail = (trailId) => {
-    const updatedTrails = trailData.filter(trail => trail.id !== trailId);
-    setTrailData(updatedTrails);
-    localStorage.setItem('trailData', JSON.stringify(updatedTrails));
-    const updatedMapImages = { ...mapImageUrl };
-    delete updatedMapImages[trailId];
-    setMapImageUrl(updatedMapImages);
+    const confirmed = window.confirm("Are you sure you want to delete this trail?");
+    if (confirmed) {
+      setTrailData(prevTrailData => {
+        const updatedTrails = prevTrailData.filter(trail => trail.id !== trailId);
+        localStorage.setItem('trailData', JSON.stringify(updatedTrails));
+        return updatedTrails;
+      });
+
+      setMapImageUrl(prevMapImageUrl => {
+        const updatedMapImages = { ...prevMapImageUrl };
+        delete updatedMapImages[trailId];
+        return updatedMapImages;
+      });
+    }
   };
 
   // Sortiere die Trails nach Datum (älteste zuerst) und dann nach Name
@@ -106,7 +119,7 @@ function Main() {
               <div key={trail.id} className="trail-item">
                 <img src={mapImageUrl[trail.id] || 'loading.jpg'} alt="Trail Map" />
                 <h4>{trail.name} - {trail.date}</h4>
-                {new Date(trail.date) < new Date() ? <span className="expired">Expired  </span> : null}
+                {new Date(trail.date) < new Date() ? <span className="expired">Expired</span> : null}
                 <button type="button" className="remove-button" onClick={() => removeTrail(trail.id)}>
                   Remove Trail
                 </button>
